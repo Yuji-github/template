@@ -1,0 +1,25 @@
+{
+    "name": "template",  // Change this for each project
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "dev",  // ensure the services in docker-compose uses this name 
+    "workspaceFolder": "/workspace",
+
+    // Extensions to install INSIDE the container automatically
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.debugpy",
+                "tamasfe.even-better-toml", 
+                "ms-toolsai.datawrangler",
+                "ms-toolsai.jupyter"
+            ],
+            "settings": {
+            "python.terminal.activateEnvironment": true,
+            "python.defaultInterpreterPath": "/workspace/.venv/bin/python"            
+        }
+        }
+    },
+    "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install --no-root",
+    "remoteUser": "vscode"
+}
