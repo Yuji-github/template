@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     procps \
     fonts-ipafont-gothic \
     fonts-ipafont-mincho \
+    build-essential \ 
+    python3-dev \ 
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry

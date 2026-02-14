@@ -33,6 +33,8 @@ WORKDIR /workspace
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-ipafont-gothic \
     fonts-ipafont-mincho \
+    build-essential \ 
+    python3-dev \ 
     && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
