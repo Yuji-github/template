@@ -1,25 +1,33 @@
 {
-    "name": "template",  // Change this for each project
+    "name": "fdua", // Change this for each project
     "dockerComposeFile": "docker-compose.yml",
-    "service": "dev",  // ensure the services in docker-compose uses this name 
+    "service": "dev", // ensure the services in docker-compose uses this name 
     "workspaceFolder": "/workspace",
-
+    // Forces .gitconfig to exist on the Host before Docker starts
+    "initializeCommand": "git config --global devcontainer.setup true",
+    // Mounts your local config (Read-Only effectively)
+    "mounts": [
+        // Binds local .gitconfig to the container's user home
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig_host,type=bind,consistency=cached"
+    ],
     // Extensions to install INSIDE the container automatically
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
                 "ms-python.debugpy",
-                "tamasfe.even-better-toml", 
+                "tamasfe.even-better-toml",
                 "ms-toolsai.datawrangler",
-                "ms-toolsai.jupyter"
+                "ms-toolsai.jupyter",
+                "github.vscode-pull-request-github",
+                "mechatroner.rainbow-csv"
             ],
             "settings": {
-            "python.terminal.activateEnvironment": true,
-            "python.defaultInterpreterPath": "/workspace/.venv/bin/python"            
-        }
+                "python.terminal.activateEnvironment": true,
+                "python.defaultInterpreterPath": "/workspace/.venv/bin/python"
+            }
         }
     },
-    "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install --no-root",
+    "postCreateCommand": "bash .devcontainer/init_container.sh",
     "remoteUser": "vscode"
 }

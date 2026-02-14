@@ -1,28 +1,23 @@
-# Create the docker production when I create the project as a placeholder of dependencies
 # STAGE 1: Builder
 FROM python:3.12-slim as builder
 
-# Set environment variables for Poetry
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Install system deps required for building python packages (gcc, etc.)
+# 1. Install ONLY build tools here
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
 RUN pip install poetry
 
 WORKDIR /workspace
 
-# Copy dependency files
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies (Production only, no dev deps)
 RUN poetry install --without dev --no-root
 
 # STAGE 2: Runtime (The final image)
@@ -34,18 +29,23 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /workspace
 
-# Create a non-root user for security
+# 2. Install FONTS here
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-ipafont-gothic \
+    fonts-ipafont-mincho \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
 RUN addgroup --system appgroup && adduser --system --group appuser
 
-# UPDATED: Copy with correct permissions
+# Copy virtualenv from builder
 COPY --from=builder --chown=appuser:appgroup /workspace/.venv /workspace/.venv
+
+# Copy source code
 COPY --chown=appuser:appgroup src /workspace/src
 
-# Switch to non-root user
 USER appuser
 
-# Optional
 EXPOSE 8050
 
-# ENTRY POINT
 CMD ["python", "src/main.py"]
